@@ -1,34 +1,43 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SideLearning.Domain.Users;
 using SideLearning.Infrastructure.Identity;
 
 namespace SideLearning.Infrastructure.Persistence.Configurations;
 
-public sealed class UserConfiguration : IEntityTypeConfiguration<DomainUserRecord>
+public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<DomainUserRecord> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("domain_users");
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Email)
-            .HasMaxLength(256)
-            .IsRequired();
+        builder.OwnsOne(x => x.Email, email =>
+        {
+            email.Property(x => x.Value)
+                .HasColumnName("Email")
+                .HasMaxLength(256)
+                .IsRequired();
 
-        builder.Property(x => x.NormalizedEmail)
-            .HasMaxLength(256)
-            .IsRequired();
+            email.Property(x => x.NormalizedValue)
+                .HasColumnName("NormalizedEmail")
+                .HasMaxLength(256)
+                .IsRequired();
+
+            email.HasIndex(x => x.NormalizedValue)
+                .IsUnique();
+        });
+        builder.Navigation(x => x.Email).IsRequired();
 
         builder.Property(x => x.DisplayName)
             .HasMaxLength(120)
             .IsRequired();
 
-        builder.HasIndex(x => x.NormalizedEmail)
-            .IsUnique();
+        builder.Ignore(x => x.DomainEvents);
 
         builder.HasOne<ApplicationUser>()
             .WithOne()
-            .HasForeignKey<DomainUserRecord>(x => x.Id)
+            .HasForeignKey<User>(x => x.Id)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

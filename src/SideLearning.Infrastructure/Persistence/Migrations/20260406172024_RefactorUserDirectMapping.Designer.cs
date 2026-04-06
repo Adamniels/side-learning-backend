@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SideLearning.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SideLearning.Infrastructure.Persistence;
 namespace SideLearning.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260406172024_RefactorUserDirectMapping")]
+    partial class RefactorUserDirectMapping
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,55 +126,6 @@ namespace SideLearning.Infrastructure.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("SideLearning.Domain.Sessions.Session", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset?>("CompletedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("EstimatedDurationInMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Goal")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTimeOffset?>("StartedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("sessions", (string)null);
                 });
 
             modelBuilder.Entity("SideLearning.Domain.Users.User", b =>
@@ -383,144 +337,6 @@ namespace SideLearning.Infrastructure.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SideLearning.Domain.Sessions.Session", b =>
-                {
-                    b.HasOne("SideLearning.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("SideLearning.Domain.Sessions.SessionContext", "Context", b1 =>
-                        {
-                            b1.Property<Guid>("SessionId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("AdditionalResources")
-                                .HasMaxLength(4000)
-                                .HasColumnType("character varying(4000)")
-                                .HasColumnName("ContextAdditionalResources");
-
-                            b1.Property<string>("Explanation")
-                                .IsRequired()
-                                .HasMaxLength(4000)
-                                .HasColumnType("character varying(4000)")
-                                .HasColumnName("ContextExplanation");
-
-                            b1.Property<string>("WhyItMatters")
-                                .IsRequired()
-                                .HasMaxLength(4000)
-                                .HasColumnType("character varying(4000)")
-                                .HasColumnName("ContextWhyItMatters");
-
-                            b1.Property<string>("YoutubeUrl")
-                                .HasMaxLength(2048)
-                                .HasColumnType("character varying(2048)")
-                                .HasColumnName("ContextYoutubeUrl");
-
-                            b1.HasKey("SessionId");
-
-                            b1.ToTable("sessions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("SessionId");
-                        });
-
-                    b.OwnsOne("SideLearning.Domain.Sessions.SessionHandsOn", "HandsOn", b1 =>
-                        {
-                            b1.Property<Guid>("SessionId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("ExpectedOutput")
-                                .HasMaxLength(4000)
-                                .HasColumnType("character varying(4000)")
-                                .HasColumnName("HandsOnExpectedOutput");
-
-                            b1.Property<string>("Instructions")
-                                .IsRequired()
-                                .HasMaxLength(8000)
-                                .HasColumnType("character varying(8000)")
-                                .HasColumnName("HandsOnInstructions");
-
-                            b1.HasKey("SessionId");
-
-                            b1.ToTable("sessions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("SessionId");
-                        });
-
-                    b.OwnsOne("SideLearning.Domain.Sessions.SessionReflection", "Reflection", b1 =>
-                        {
-                            b1.Property<Guid>("SessionId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int?>("DifficultyFeedback")
-                                .HasColumnType("integer")
-                                .HasColumnName("ReflectionDifficultyFeedback");
-
-                            b1.Property<string>("Notes")
-                                .HasMaxLength(8000)
-                                .HasColumnType("character varying(8000)")
-                                .HasColumnName("ReflectionNotes");
-
-                            b1.Property<string>("Reflection")
-                                .HasMaxLength(8000)
-                                .HasColumnType("character varying(8000)")
-                                .HasColumnName("ReflectionText");
-
-                            b1.Property<string>("Solution")
-                                .HasMaxLength(8000)
-                                .HasColumnType("character varying(8000)")
-                                .HasColumnName("ReflectionSolution");
-
-                            b1.HasKey("SessionId");
-
-                            b1.ToTable("sessions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("SessionId");
-                        });
-
-                    b.OwnsMany("SideLearning.Domain.Sessions.SessionTopic", "Topics", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("SessionId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(300)
-                                .HasColumnType("character varying(300)")
-                                .HasColumnName("Topic");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("SessionId");
-
-                            b1.ToTable("session_topics", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("SessionId");
-                        });
-
-                    b.Navigation("Context")
-                        .IsRequired();
-
-                    b.Navigation("HandsOn")
-                        .IsRequired();
-
-                    b.Navigation("Reflection")
-                        .IsRequired();
-
-                    b.Navigation("Topics");
                 });
 
             modelBuilder.Entity("SideLearning.Domain.Users.User", b =>
