@@ -6,3 +6,9 @@ Framework-independent **domain model** for Side Learning.
 - Do **not** reference EF Core, ASP.NET Core, Identity, or configuration APIs.
 
 Example: `Topics/Topic.cs`.
+
+## Domain foundation
+
+- `Common/Entity.cs` provides identity-based equality and domain event collection.
+- `Common/AggregateRoot.cs` marks aggregate roots (for example `User`, `Topic`).
+- `Common/IDomainEvent.cs` is the contract for domain events raised by aggregates.

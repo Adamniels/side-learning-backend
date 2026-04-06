@@ -118,7 +118,8 @@ The generated TypeScript client currently uses the `fetch` runtime from `openapi
 
 - **Access token:** JWT, sent as `Authorization: Bearer <access_token>`.
 - **Refresh token:** Opaque string returned by register/login/refresh; store securely and send to `POST /api/v1/auth/refresh`. Tokens are **hashed at rest** and **rotated** on refresh.
-- **Users:** ASP.NET Core Identity with **email + password**; **`UserName` equals `Email`**; **unique email** enforced (`RequireUniqueEmail` + database index).
+- **Users:** Hybrid model — ASP.NET Core Identity for credentials/security primitives and a first-class Domain User in `domain_users` for product state.
+- **Identity user:** **`UserName` equals `Email`**, unique email policy enabled, password hashing/verification and lockout primitives remain in Identity.
 
 ### Recommended approach for Next.js
 

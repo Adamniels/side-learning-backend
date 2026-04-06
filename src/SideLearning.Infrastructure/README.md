@@ -3,7 +3,7 @@
 Technical implementations: **EF Core**, **PostgreSQL**, **ASP.NET Core Identity**, **JWT access tokens**, and **refresh token** persistence.
 
 - **Persistence/** — `ApplicationDbContext`, EF configurations, migrations.
-- **Identity/** — `ApplicationUser`, `ApplicationRole`, `IdentityAccountService`.
+- **Identity/** — `ApplicationUser`, `ApplicationRole`, `IdentityCredentialService`.
 - **Authentication/** — `JwtOptions`, `AuthTokenService`.
 - **DependencyInjection.cs** — `AddInfrastructure`.
 

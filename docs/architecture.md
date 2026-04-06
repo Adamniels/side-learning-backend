@@ -13,7 +13,7 @@ The system deploys as **one ASP.NET Core process** and **one PostgreSQL database
 | Layer | Responsibility |
 |--------|------------------|
 | **Domain** | Entities, value objects, domain-centric errors/invariants. No infrastructure or framework coupling. |
-| **Application** | Use cases, validation, orchestration, abstractions (`IApplicationDbContext`, `IIdentityAccountService`, `IAuthTokenService`). |
+| **Application** | Use cases, validation, orchestration, abstractions (`IApplicationDbContext`, `ICredentialService`, `IUserRepository`, `IAuthTokenService`). |
 | **Infrastructure** | EF Core, Identity, JWT signing, refresh token storage, migrations. |
 | **Api** | HTTP surface: routing, auth attributes, middleware, OpenAPI. **No business rules.** |
 
@@ -34,8 +34,9 @@ flowchart LR
 
 ## Authentication placement
 
-- **Identity user** (`ApplicationUser`) and **EF stores** live in **Infrastructure**.
-- **Register/login/refresh/revoke** orchestration lives in **Application** handlers; they depend on **abstractions** (`IIdentityAccountService`, `IAuthTokenService`).
+- **Identity user** (`ApplicationUser`) and **EF stores** live in **Infrastructure** for credentials and security primitives.
+- **Domain user** lives in `domain_users` and is the product/business aggregate source of truth.
+- **Register/login/refresh/revoke** orchestration lives in **Application** handlers; they depend on **abstractions** (`ICredentialService`, `IUserRepository`, `IAuthTokenService`).
 - **JWT validation** and **Bearer** authentication are configured in **Api** (`Program.cs`).
 
 ## Authorization

@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SideLearning.Application.Abstractions.Authentication;
-using SideLearning.Application.Abstractions.Identity;
 using SideLearning.Application.Abstractions.Persistence;
+using SideLearning.Application.Abstractions.Users;
 using SideLearning.Infrastructure.Authentication;
 using SideLearning.Infrastructure.Identity;
 using SideLearning.Infrastructure.Persistence;
+using SideLearning.Infrastructure.Persistence.Repositories;
 
 namespace SideLearning.Infrastructure;
 
@@ -36,7 +37,8 @@ public static class DependencyInjection
             .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddScoped<IIdentityAccountService, IdentityAccountService>();
+        services.AddScoped<ICredentialService, IdentityCredentialService>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthTokenService, AuthTokenService>();
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 

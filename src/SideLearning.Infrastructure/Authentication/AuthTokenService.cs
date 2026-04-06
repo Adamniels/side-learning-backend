@@ -19,21 +19,10 @@ public sealed class AuthTokenService(
 {
     private readonly JwtOptions _options = jwtOptions.Value;
 
-    public async Task<AuthTokenPair> IssueForUserAsync(
-        Guid userId,
-        string email,
-        IReadOnlyList<string> roles,
-        CancellationToken cancellationToken)
+    public async Task<AuthTokenPair> IssueForPrincipalAsync(AuthTokenPrincipal principal, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user is null)
-        {
-            throw new InvalidOperationException("User not found for token issuance.");
-        }
-
-        var roleList = roles.Count > 0 ? roles : (await userManager.GetRolesAsync(user)).ToList();
-        var access = CreateAccessToken(userId, email, roleList);
-        var refresh = await CreateRefreshTokenAsync(userId, cancellationToken);
+        var access = CreateAccessToken(principal.UserId, principal.Email, principal.Roles);
+        var refresh = await CreateRefreshTokenAsync(principal.UserId, cancellationToken);
         return new AuthTokenPair(access.Token, refresh.RawToken, access.ExpiresAtUtc, refresh.ExpiresAtUtc);
     }
 

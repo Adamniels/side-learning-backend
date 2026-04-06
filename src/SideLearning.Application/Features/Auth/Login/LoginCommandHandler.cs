@@ -1,29 +1,38 @@
 using FluentValidation;
 using SideLearning.Application.Abstractions.Authentication;
-using SideLearning.Application.Abstractions.Identity;
+using SideLearning.Application.Abstractions.Users;
 using SideLearning.Application.Common.Exceptions;
 
 namespace SideLearning.Application.Features.Auth.Login;
 
 public sealed class LoginCommandHandler(
     IValidator<LoginCommand> validator,
-    IIdentityAccountService identityAccountService,
+    ICredentialService credentialService,
+    IUserRepository userRepository,
     IAuthTokenService authTokenService)
 {
     public async Task<AuthTokenPair> HandleAsync(LoginCommand command, CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(command, cancellationToken);
 
-        var user = await identityAccountService.ValidateCredentialsAsync(
+        var principal = await credentialService.ValidateAsync(
             command.Email.Trim(),
             command.Password,
             cancellationToken);
 
-        if (user is null)
+        if (principal is null)
         {
             throw new UnauthorizedAppException("invalid_credentials", "Invalid email or password.");
         }
 
-        return await authTokenService.IssueForUserAsync(user.UserId, user.Email, user.Roles, cancellationToken);
+        var user = await userRepository.GetByIdAsync(principal.UserId, cancellationToken);
+        if (user is null || !user.CanLogin())
+        {
+            throw new UnauthorizedAppException("invalid_credentials", "Invalid email or password.");
+        }
+
+        return await authTokenService.IssueForPrincipalAsync(
+            new AuthTokenPrincipal(principal.UserId, principal.Email, principal.Roles),
+            cancellationToken);
     }
 }

@@ -1,8 +1,9 @@
+using SideLearning.Domain.Common;
+
 namespace SideLearning.Domain.Topics;
 
-public sealed class Topic
+public sealed class Topic : AggregateRoot
 {
-    public Guid Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Slug { get; private set; } = string.Empty;
     public DateTimeOffset CreatedAtUtc { get; private set; }
@@ -16,12 +17,15 @@ public sealed class Topic
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(slug);
 
-        return new Topic
+        var topic = new Topic
         {
             Id = Guid.NewGuid(),
             Name = name.Trim(),
             Slug = slug.Trim().ToLowerInvariant(),
             CreatedAtUtc = DateTimeOffset.UtcNow
         };
+
+        topic.AddDomainEvent(new TopicCreatedDomainEvent(topic.Id, DateTimeOffset.UtcNow));
+        return topic;
     }
 }

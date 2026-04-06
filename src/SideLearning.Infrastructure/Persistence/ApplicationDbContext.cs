@@ -11,6 +11,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 {
     public DbSet<Topic> Topics => Set<Topic>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<DomainUserRecord> DomainUsers => Set<DomainUserRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

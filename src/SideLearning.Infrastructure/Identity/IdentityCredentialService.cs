@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Identity;
-using SideLearning.Application.Abstractions.Identity;
+using SideLearning.Application.Abstractions.Authentication;
 using SideLearning.Application.Features.Auth.Register;
 
 namespace SideLearning.Infrastructure.Identity;
 
-public sealed class IdentityAccountService(UserManager<ApplicationUser> userManager) : IIdentityAccountService
+public sealed class IdentityCredentialService(UserManager<ApplicationUser> userManager) : ICredentialService
 {
-    public async Task<RegisterUserResult> RegisterAsync(
+    public async Task<CreateCredentialResult> CreateAsync(
         string email,
         string password,
         string? displayName,
@@ -28,17 +28,17 @@ public sealed class IdentityAccountService(UserManager<ApplicationUser> userMana
         {
             var duplicate = result.Errors.Any(e =>
                 e.Code is "DuplicateUserName" or "DuplicateEmail");
-            return new RegisterUserResult(
+            return new CreateCredentialResult(
                 false,
                 null,
                 duplicate ? RegisterErrorCodes.DuplicateEmail : "identity_error",
                 result.Errors.Select(e => e.Description));
         }
 
-        return new RegisterUserResult(true, user.Id, null, null);
+        return new CreateCredentialResult(true, user.Id, null, null);
     }
 
-    public async Task<UserAuthInfo?> ValidateCredentialsAsync(
+    public async Task<CredentialPrincipal?> ValidateAsync(
         string email,
         string password,
         CancellationToken cancellationToken)
@@ -58,6 +58,19 @@ public sealed class IdentityAccountService(UserManager<ApplicationUser> userMana
         }
 
         var roles = await userManager.GetRolesAsync(user);
-        return new UserAuthInfo(user.Id, user.Email ?? email, roles.ToList());
+        return new CredentialPrincipal(user.Id, user.Email ?? email, roles.ToList());
+    }
+
+    public async Task DeleteAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return;
+        }
+
+        await userManager.DeleteAsync(user);
     }
 }
