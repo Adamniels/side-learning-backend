@@ -1,4 +1,3 @@
-using SideLearning.Domain.Topics;
 using SideLearning.Domain.Users;
 
 namespace SideLearning.Application.Tests;
@@ -11,10 +10,10 @@ public sealed class DomainFoundationTests
         var id = Guid.NewGuid();
         var userA = User.Rehydrate(id, UserEmail.Create("same@example.com"), "A", true, false, DateTimeOffset.UtcNow, null, null);
         var userB = User.Rehydrate(id, UserEmail.Create("other@example.com"), "B", true, false, DateTimeOffset.UtcNow, null, null);
-        var topic = Topic.Create("Topic", "topic");
+        var otherUser = User.Rehydrate(Guid.NewGuid(), UserEmail.Create("third@example.com"), "C", true, false, DateTimeOffset.UtcNow, null, null);
 
         Assert.True(userA.Equals(userB));
-        Assert.False(userA.Equals(topic));
+        Assert.False(userA.Equals(otherUser));
     }
 
     [Fact]
@@ -25,13 +24,5 @@ public sealed class DomainFoundationTests
         Assert.NotEmpty(user.DomainEvents);
         user.ClearDomainEvents();
         Assert.Empty(user.DomainEvents);
-    }
-
-    [Fact]
-    public void Topic_creation_adds_topic_created_event()
-    {
-        var topic = Topic.Create("Algebra", "Algebra");
-
-        Assert.Contains(topic.DomainEvents, e => e is TopicCreatedDomainEvent);
     }
 }

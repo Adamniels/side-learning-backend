@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
 using SideLearning.Api.Features.Auth;
-using SideLearning.Api.Features.Topics;
 using SideLearning.Api.Middleware;
 using SideLearning.Application;
 using SideLearning.Infrastructure;
@@ -109,7 +108,6 @@ app.UseHttpsRedirection();
 
 var apiV1 = app.MapGroup("/api/v1");
 apiV1.MapAuthEndpoints();
-apiV1.MapTopicEndpoints();
 
 app.MapHealthChecks("/health");
 

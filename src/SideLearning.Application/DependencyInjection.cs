@@ -13,9 +13,6 @@ public static class DependencyInjection
         services.AddScoped<Features.Auth.Login.LoginCommandHandler>();
         services.AddScoped<Features.Auth.Refresh.RefreshTokenCommandHandler>();
         services.AddScoped<Features.Auth.Revoke.RevokeRefreshCommandHandler>();
-        services.AddScoped<Features.Topics.CreateTopic.CreateTopicCommandHandler>();
-        services.AddScoped<Features.Topics.GetTopics.GetTopicsQueryHandler>();
-        services.AddScoped<Features.Topics.GetTopicById.GetTopicByIdQueryHandler>();
         return services;
     }
 }

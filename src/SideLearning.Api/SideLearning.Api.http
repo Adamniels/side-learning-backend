@@ -1,14 +1,7 @@
 @SideLearning.Api_HostAddress = https://localhost:7188
-@accessToken = your_access_token_here
 
 ### Health
 GET {{SideLearning.Api_HostAddress}}/health
-Accept: application/json
-
-###
-
-### List topics (public)
-GET {{SideLearning.Api_HostAddress}}/api/v1/topics?page=1&pageSize=20
 Accept: application/json
 
 ###
@@ -36,13 +29,3 @@ Content-Type: application/json
 
 ###
 
-### Create topic (requires Bearer token)
-POST {{SideLearning.Api_HostAddress}}/api/v1/topics
-Content-Type: application/json
-Authorization: Bearer {{accessToken}}
-
-{
-  "name": "Linear Algebra"
-}
-
-###

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SideLearning.Application.Abstractions.Authentication;
-using SideLearning.Application.Abstractions.Persistence;
 using SideLearning.Application.Abstractions.Users;
 using SideLearning.Infrastructure.Authentication;
 using SideLearning.Infrastructure.Identity;
@@ -21,8 +20,6 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
-
-        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         services
             .AddIdentityCore<ApplicationUser>(options =>

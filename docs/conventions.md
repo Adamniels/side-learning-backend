@@ -69,9 +69,9 @@ Response envelope:
 
 ## Naming
 
-- Commands: `VerbNounCommand` (for example `CreateTopicCommand`).
-- Handlers: `CreateTopicCommandHandler`.
-- Validators: `CreateTopicCommandValidator`.
+- Commands: `VerbNounCommand` (for example `RegisterCommand`).
+- Handlers: `RegisterCommandHandler`.
+- Validators: `RegisterCommandValidator`.
 - Endpoints: `*Endpoints` static class with `Map*Endpoints` extension on `RouteGroupBuilder`.
 
 ## Integration test conventions

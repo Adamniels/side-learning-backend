@@ -6,14 +6,14 @@ This backend prioritizes **clear boundaries**, **security baselines** (Identity,
 
 ## Modular monolith
 
-The system deploys as **one ASP.NET Core process** and **one PostgreSQL database**. Features are grouped in **feature folders** inside Application, Infrastructure (EF configuration), and Api so navigation follows product concepts (Auth, Topics, …).
+The system deploys as **one ASP.NET Core process** and **one PostgreSQL database**. Features are grouped in **feature folders** inside Application, Infrastructure (EF configuration), and Api so navigation follows product concepts (Auth, Users, ...).
 
 ## Layer responsibilities
 
 | Layer | Responsibility |
 |--------|------------------|
 | **Domain** | Entities, value objects, domain-centric errors/invariants. No infrastructure or framework coupling. |
-| **Application** | Use cases, validation, orchestration, abstractions (`IApplicationDbContext`, `ICredentialService`, `IUserRepository`, `IAuthTokenService`). |
+| **Application** | Use cases, validation, orchestration, abstractions (`ICredentialService`, `IUserRepository`, `IAuthTokenService`). |
 | **Infrastructure** | EF Core, Identity, JWT signing, refresh token storage, migrations. |
 | **Api** | HTTP surface: routing, auth attributes, middleware, OpenAPI. **No business rules.** |
 
@@ -41,7 +41,7 @@ flowchart LR
 
 ## Authorization
 
-`Program.cs` registers ASP.NET Core **authorization**. The sample **Topics** feature uses `.RequireAuthorization()` on `POST /api/v1/topics`. Extend with **policies** and roles as the product grows (`AddAuthorization(options => …)`).
+`Program.cs` registers ASP.NET Core **authorization**. Extend with **policies** and roles as the product grows (`AddAuthorization(options => …)`).
 
 ## Refresh tokens
 

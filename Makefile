@@ -13,7 +13,7 @@ DISPLAY_NAME ?= Test User
 REFRESH_TOKEN ?=
 NAME ?=
 
-.PHONY: help restore build test test-integration test-all clean format db-up db-down db-logs db-ps db-reset run run-http run-https watch migrate migration-add migration-remove register login refresh revoke health topics openapi-export contracts-ts-install contracts-ts-generate
+.PHONY: help restore build test test-integration test-all clean format db-up db-down db-logs db-ps db-reset run run-http run-https watch migrate migration-add migration-remove register login refresh revoke health openapi-export contracts-ts-install contracts-ts-generate
 
 help: ## Show all available commands
 	@echo "Useful commands:" 
@@ -101,9 +101,6 @@ revoke: ## Revoke refresh token (set REFRESH_TOKEN=...)
 	curl -sS -w "\nHTTP %{http_code}\n" -X POST $(API_URL)/api/v1/auth/revoke \
 		-H "Content-Type: application/json" \
 		-d '{"refreshToken":"$(REFRESH_TOKEN)"}'
-
-topics: ## List topics (page/pageSize)
-	curl -sS -w "\nHTTP %{http_code}\n" "$(API_URL)/api/v1/topics?page=1&pageSize=20"
 
 openapi-export: ## Export swagger json to contracts/openapi/openapi.json
 	@mkdir -p contracts/openapi

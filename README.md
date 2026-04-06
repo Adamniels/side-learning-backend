@@ -141,7 +141,7 @@ The API is **Bearer-first** so **web and mobile share the same contract**. Web h
 
 1. Set `Cors:AllowedOrigins` to your Next dev/prod origin (for example `http://localhost:3000`).
 2. Call `https://your-api-host/api/v1/...` with `fetch` or your HTTP client.
-3. After login/register, send `Authorization: Bearer <accessToken>` on protected routes (for example `POST /api/v1/topics`).
+3. After login/register, send `Authorization: Bearer <accessToken>` on protected routes.
 4. On `401`, call `POST /api/v1/auth/refresh` with the refresh token, then retry the request.
 
 ## Using this backend from Expo / React Native
@@ -159,7 +159,7 @@ See [docs/conventions.md](docs/conventions.md) for errors, pagination, validatio
 - **New HTTP endpoints:** Add a `MapGroup` or extend an existing one under `src/SideLearning.Api/Features/<Feature>/`, calling Application handlers only. Do not put business rules in the Api project.
 - **New use cases:** Add `Features/<Feature>/<Action>/` under **Application** with command/query, `*Validator`, and `*Handler`. Register the handler in `Application/DependencyInjection.cs` if you use explicit registration.
 - **Domain logic:** Put entities and domain-only rules in **Domain**. Keep them free of EF attributes, `IConfiguration`, Identity types, and HTTP types.
-- **Persistence:** Add EF configurations under `Infrastructure/Persistence/Configurations/`, implement `IApplicationDbContext` on `ApplicationDbContext` if you add new aggregate roots exposed to Application.
+- **Persistence:** Add EF configurations under `Infrastructure/Persistence/Configurations/` and keep persistence access behind repository abstractions used by Application.
 - **What must never go in Domain:** Connection strings, DbContext, `UserManager`, JWT code, DTOs shaped only for HTTP, FluentValidation rules (validators live in Application).
 
 Preserve existing naming, feature folders, Problem Details error shape, and `/api/v1` versioning unless the team agrees to change them.
