@@ -23,3 +23,7 @@ x86/
 ## NuGet
 *.nupkg
 **/packages/*
+
+## Node
+node_modules/
+**/node_modules/

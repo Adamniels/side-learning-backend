@@ -13,7 +13,7 @@ DISPLAY_NAME ?= Test User
 REFRESH_TOKEN ?=
 NAME ?=
 
-.PHONY: help restore build test clean format db-up db-down db-logs db-ps db-reset run run-http run-https watch migrate migration-add migration-remove register login refresh revoke health topics
+.PHONY: help restore build test test-integration test-all clean format db-up db-down db-logs db-ps db-reset run run-http run-https watch migrate migration-add migration-remove register login refresh revoke health topics openapi-export contracts-ts-install contracts-ts-generate
 
 help: ## Show all available commands
 	@echo "Useful commands:" 
@@ -27,6 +27,13 @@ build: ## Build entire solution
 
 test: ## Run tests
 	dotnet test $(SOLUTION)
+
+test-integration: ## Run API integration tests (requires Docker)
+	dotnet test tests/SideLearning.Api.IntegrationTests/SideLearning.Api.IntegrationTests.csproj
+
+test-all: ## Run unit and integration tests
+	dotnet test tests/SideLearning.Application.Tests/SideLearning.Application.Tests.csproj
+	dotnet test tests/SideLearning.Api.IntegrationTests/SideLearning.Api.IntegrationTests.csproj
 
 clean: ## Clean build outputs
 	dotnet clean $(SOLUTION)
@@ -97,3 +104,21 @@ revoke: ## Revoke refresh token (set REFRESH_TOKEN=...)
 
 topics: ## List topics (page/pageSize)
 	curl -sS -w "\nHTTP %{http_code}\n" "$(API_URL)/api/v1/topics?page=1&pageSize=20"
+
+openapi-export: ## Export swagger json to contracts/openapi/openapi.json
+	@mkdir -p contracts/openapi
+	@ASPNETCORE_ENVIRONMENT=Development dotnet run --project $(API_PROJECT) --launch-profile http --no-build > /tmp/sidelearning-openapi.log 2>&1 & \
+	PID=$$!; \
+	for i in {1..40}; do \
+		curl -fsS $(API_URL)/swagger/v1/swagger.json -o contracts/openapi/openapi.json && break; \
+		sleep 1; \
+	done; \
+	kill $$PID >/dev/null 2>&1 || true; \
+	wait $$PID >/dev/null 2>&1 || true; \
+	test -f contracts/openapi/openapi.json
+
+contracts-ts-install: ## Install TypeScript contracts generator dependencies
+	npm --prefix contracts/typescript install
+
+contracts-ts-generate: contracts-ts-install openapi-export ## Generate TS client+types from OpenAPI
+	npm --prefix contracts/typescript run generate

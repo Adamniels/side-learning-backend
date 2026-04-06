@@ -24,6 +24,10 @@ src/
   SideLearning.Api/          # Host — launch this project
 tests/
   SideLearning.Application.Tests/
+  SideLearning.Api.IntegrationTests/
+contracts/
+  openapi/
+  typescript/
 docs/
   architecture.md
   conventions.md
@@ -103,6 +107,13 @@ dotnet ef migrations add YourMigrationName --project src/SideLearning.Infrastruc
 
 Use the document to generate TypeScript clients (for example OpenAPI Generator, `openapi-typescript`, or Kiota).
 
+### OpenAPI export + TypeScript generation
+
+- Export spec: `make openapi-export` → `contracts/openapi/openapi.json`
+- Generate TS contracts: `make contracts-ts-generate` → `contracts/typescript/src/generated`
+
+The generated TypeScript client currently uses the `fetch` runtime from `openapi-typescript-codegen`.
+
 ## Auth overview (web and mobile)
 
 - **Access token:** JWT, sent as `Authorization: Bearer <access_token>`.
@@ -164,6 +175,25 @@ Preserve existing naming, feature folders, Problem Details error shape, and `/ap
 ```bash
 dotnet test
 ```
+
+### Integration tests (Testcontainers)
+
+Integration tests live in `tests/SideLearning.Api.IntegrationTests` and use PostgreSQL Testcontainers.
+
+```bash
+make test-integration
+```
+
+Run all tests:
+
+```bash
+make test-all
+```
+
+Requirements:
+
+- Docker must be available/running on the machine.
+- The tests create and tear down their own PostgreSQL container automatically.
 
 ## Next recommended improvements
 

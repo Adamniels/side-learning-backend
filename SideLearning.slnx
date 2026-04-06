@@ -6,6 +6,7 @@
     <Project Path="src/SideLearning.Infrastructure/SideLearning.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/SideLearning.Api.IntegrationTests/SideLearning.Api.IntegrationTests.csproj" />
     <Project Path="tests/SideLearning.Application.Tests/SideLearning.Application.Tests.csproj" />
   </Folder>
 </Solution>

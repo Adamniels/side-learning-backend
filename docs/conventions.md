@@ -73,3 +73,16 @@ Response envelope:
 - Handlers: `CreateTopicCommandHandler`.
 - Validators: `CreateTopicCommandValidator`.
 - Endpoints: `*Endpoints` static class with `Map*Endpoints` extension on `RouteGroupBuilder`.
+
+## Integration test conventions
+
+- API integration tests live in `tests/SideLearning.Api.IntegrationTests`.
+- Use `WebApplicationFactory<Program>` with Testcontainers-backed PostgreSQL.
+- Test behavior through HTTP endpoints (status codes + response payload shape), not by directly querying internal services.
+
+## TypeScript contracts conventions
+
+- OpenAPI source file: `contracts/openapi/openapi.json`.
+- Generated output: `contracts/typescript/src/generated`.
+- Regenerate after endpoint/contract changes using `make contracts-ts-generate`.
+- Do not hand-edit generated files.
