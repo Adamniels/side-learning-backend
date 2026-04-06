@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SideLearning.Api/SideLearning.Api.csproj" />
+    <Project Path="src/SideLearning.Application/SideLearning.Application.csproj" />
+    <Project Path="src/SideLearning.Domain/SideLearning.Domain.csproj" />
+    <Project Path="src/SideLearning.Infrastructure/SideLearning.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SideLearning.Application.Tests/SideLearning.Application.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,27 @@
+# Local PostgreSQL for Side Learning (matches appsettings.Development.json).
+# Start: docker compose up -d
+# Stop:  docker compose down
+#
+# Only one container can bind host port 5432. Stop other Postgres containers first if needed.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: sidelearning-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sidelearning_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - sidelearning_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sidelearning_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sidelearning_pgdata:

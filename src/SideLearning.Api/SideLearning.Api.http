@@ -1,0 +1,48 @@
+@SideLearning.Api_HostAddress = https://localhost:7188
+@accessToken = your_access_token_here
+
+### Health
+GET {{SideLearning.Api_HostAddress}}/health
+Accept: application/json
+
+###
+
+### List topics (public)
+GET {{SideLearning.Api_HostAddress}}/api/v1/topics?page=1&pageSize=20
+Accept: application/json
+
+###
+
+### Register
+POST {{SideLearning.Api_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password1!",
+  "displayName": "Test User"
+}
+
+###
+
+### Login
+POST {{SideLearning.Api_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password1!"
+}
+
+###
+
+### Create topic (requires Bearer token)
+POST {{SideLearning.Api_HostAddress}}/api/v1/topics
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Linear Algebra"
+}
+
+###
