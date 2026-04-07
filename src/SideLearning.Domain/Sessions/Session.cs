@@ -9,10 +9,11 @@ public sealed class Session : AggregateRoot
     public string Title { get; private set; } = null!;
     public string Summary { get; private set; } = null!;
 
-    private readonly List<SessionTopic> _topics = new();
-    public IReadOnlyCollection<SessionTopic> Topics => _topics.AsReadOnly();
+    private readonly List<SessionSubjectArea> _subjectAreas = new();
+    public IReadOnlyCollection<SessionSubjectArea> SubjectAreas => _subjectAreas.AsReadOnly();
 
     public string Goal { get; private set; } = null!;
+    public string Extension { get; private set; } = null!;
 
     public SessionStatus Status { get; private set; }
 
@@ -35,10 +36,11 @@ public sealed class Session : AggregateRoot
         string title,
         string summary,
         string goal,
+        string extension,
         SessionContext context,
         SessionHandsOn handsOn,
         SessionReflection reflection,
-        IEnumerable<SessionTopic>? topics = null,
+        IEnumerable<SessionSubjectArea>? subjectAreas = null,
         int? estimatedDurationInMinutes = null)
     {
         if (id == Guid.Empty)
@@ -66,6 +68,11 @@ public sealed class Session : AggregateRoot
             throw new ArgumentException("Goal cannot be null or whitespace.", nameof(goal));
         }
 
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            throw new ArgumentException("Extension cannot be null or whitespace.", nameof(extension));
+        }
+
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(handsOn);
         ArgumentNullException.ThrowIfNull(reflection);
@@ -85,6 +92,7 @@ public sealed class Session : AggregateRoot
             Title = title.Trim(),
             Summary = summary.Trim(),
             Goal = goal.Trim(),
+            Extension = extension.Trim(),
             Status = SessionStatus.Draft,
             EstimatedDurationInMinutes = estimatedDurationInMinutes,
             Context = context,
@@ -94,9 +102,9 @@ public sealed class Session : AggregateRoot
             UpdatedAtUtc = now
         };
 
-        if (topics is not null)
+        if (subjectAreas is not null)
         {
-            session._topics.AddRange(topics);
+            session._subjectAreas.AddRange(subjectAreas);
         }
 
         return session;

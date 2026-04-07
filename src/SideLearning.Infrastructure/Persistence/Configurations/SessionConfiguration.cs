@@ -16,6 +16,7 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(x => x.Title).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Summary).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.Goal).HasMaxLength(2000).IsRequired();
+        builder.Property(x => x.Extension).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.EstimatedDurationInMinutes);
         builder.Property(x => x.CreatedAtUtc).IsRequired();
         builder.Property(x => x.UpdatedAtUtc).IsRequired();
@@ -86,18 +87,18 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         });
         builder.Navigation(x => x.Reflection).IsRequired();
 
-        builder.Metadata.FindNavigation(nameof(Session.Topics))!
+        builder.Metadata.FindNavigation(nameof(Session.SubjectAreas))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.OwnsMany(x => x.Topics, topics =>
+        builder.OwnsMany(x => x.SubjectAreas, subjectAreas =>
         {
-            topics.ToTable("session_topics");
-            topics.WithOwner().HasForeignKey("SessionId");
-            topics.Property<int>("Id");
-            topics.HasKey("Id");
+            subjectAreas.ToTable("session_subject_areas");
+            subjectAreas.WithOwner().HasForeignKey("SessionId");
+            subjectAreas.Property<int>("Id");
+            subjectAreas.HasKey("Id");
 
-            topics.Property(x => x.Value)
-                .HasColumnName("Topic")
+            subjectAreas.Property(x => x.Value)
+                .HasColumnName("SubjectArea")
                 .HasMaxLength(300)
                 .IsRequired();
         });
