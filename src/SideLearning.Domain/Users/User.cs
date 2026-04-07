@@ -4,6 +4,8 @@ namespace SideLearning.Domain.Users;
 
 public sealed class User : AggregateRoot
 {
+    private const int MaxInterestsCount = 30;
+
     public UserEmail Email { get; private set; } = null!;
     public string DisplayName { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
@@ -12,9 +14,11 @@ public sealed class User : AggregateRoot
     public DateTimeOffset? UpdatedAtUtc { get; private set; }
     public DateTimeOffset? SuspendedAtUtc { get; private set; }
 
-    private User()
-    {
-    }
+    private readonly List<UserInterest> _userInterest = new();
+    public IReadOnlyCollection<UserInterest> UserInterests => _userInterest.AsReadOnly();
+
+
+    private User() { }
 
     public static User Create(Guid id, UserEmail email, string? displayName)
     {
@@ -126,6 +130,84 @@ public sealed class User : AggregateRoot
     }
 
     public bool CanLogin() => IsActive && !IsSuspended;
+
+    public void AddInterest(string label, float weight, string? context)
+    {
+        var interest = UserInterest.Create(label, weight, context);
+        EnsureInterestLimitNotReached();
+        EnsureNoDuplicateLabel(interest.Label);
+        _userInterest.Add(interest);
+        UpdatedAtUtc = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateInterest(string currentLabel, string newLabel, float weight, string? context)
+    {
+        if (string.IsNullOrWhiteSpace(currentLabel))
+        {
+            throw new ArgumentException("Current interest label cannot be null or whitespace.", nameof(currentLabel));
+        }
+
+        var existingIndex = FindInterestIndex(currentLabel);
+        if (existingIndex < 0)
+        {
+            throw new InvalidOperationException("Cannot update user interest that does not exist.");
+        }
+
+        var updatedInterest = UserInterest.Create(newLabel, weight, context);
+        if (!string.Equals(_userInterest[existingIndex].Label, updatedInterest.Label, StringComparison.OrdinalIgnoreCase))
+        {
+            EnsureNoDuplicateLabel(updatedInterest.Label);
+        }
+
+        _userInterest[existingIndex] = updatedInterest;
+        UpdatedAtUtc = DateTimeOffset.UtcNow;
+    }
+
+    public void RemoveInterest(string label)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            throw new ArgumentException("User interest label cannot be null or whitespace.", nameof(label));
+        }
+
+        var existingIndex = FindInterestIndex(label);
+        if (existingIndex < 0)
+        {
+            return;
+        }
+
+        _userInterest.RemoveAt(existingIndex);
+        UpdatedAtUtc = DateTimeOffset.UtcNow;
+    }
+
+    public bool HasInterest(string label)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            return false;
+        }
+
+        return FindInterestIndex(label) >= 0;
+    }
+
+    private int FindInterestIndex(string label)
+        => _userInterest.FindIndex(x => string.Equals(x.Label, label.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    private void EnsureNoDuplicateLabel(string label)
+    {
+        if (_userInterest.Any(x => string.Equals(x.Label, label, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException("User interest labels must be unique.");
+        }
+    }
+
+    private void EnsureInterestLimitNotReached()
+    {
+        if (_userInterest.Count >= MaxInterestsCount)
+        {
+            throw new InvalidOperationException($"A user can have at most {MaxInterestsCount} interests.");
+        }
+    }
 
     private static string NormalizeDisplayName(string? displayName)
     {

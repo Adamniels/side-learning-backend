@@ -33,6 +33,35 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(120)
             .IsRequired();
 
+        builder.Navigation(x => x.UserInterests)
+            .HasField("_userInterest")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.OwnsMany(x => x.UserInterests, interests =>
+        {
+            interests.ToTable("user_interests");
+            interests.WithOwner().HasForeignKey("UserId");
+            interests.Property<int>("Id");
+            interests.HasKey("Id");
+
+            interests.Property(x => x.Label)
+                .HasColumnName("Label")
+                .HasMaxLength(UserInterest.MaxLabelLength)
+                .IsRequired();
+
+            interests.Property(x => x.Weight)
+                .HasColumnName("Weight")
+                .IsRequired();
+
+            interests.Property(x => x.Context)
+                .HasColumnName("Context")
+                .HasMaxLength(UserInterest.MaxContextLength)
+                .IsRequired();
+
+            interests.HasIndex("UserId", "Label")
+                .IsUnique();
+        });
+
         builder.Ignore(x => x.DomainEvents);
 
         builder.HasOne<ApplicationUser>()
