@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
 using SideLearning.Api.Features.Auth;
+using SideLearning.Api.Features.Sessions;
 using SideLearning.Api.Features.Users;
 using SideLearning.Api.Middleware;
 using SideLearning.Application;
@@ -89,8 +90,8 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseSerilogRequestLogging();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -110,6 +111,7 @@ app.UseHttpsRedirection();
 var apiV1 = app.MapGroup("/api/v1");
 apiV1.MapAuthEndpoints();
 apiV1.MapUserInterestEndpoints();
+apiV1.MapSessionEndpoints();
 
 app.MapHealthChecks("/health");
 

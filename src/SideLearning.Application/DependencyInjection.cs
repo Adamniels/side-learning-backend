@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<AddUserInterestCommandHandler>();
         services.AddScoped<UpdateUserInterestCommandHandler>();
         services.AddScoped<RemoveUserInterestCommandHandler>();
+        services.AddScoped<SideLearning.Application.Features.Sessions.List.ListSessionsQueryHandler>();
         return services;
     }
 }

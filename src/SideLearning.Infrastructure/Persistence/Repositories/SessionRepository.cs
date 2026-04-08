@@ -17,4 +17,12 @@ public sealed class SessionRepository(ApplicationDbContext dbContext) : ISession
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
         => dbContext.SaveChangesAsync(cancellationToken);
+
+    public async Task<IReadOnlyCollection<Session>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Sessions
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.UpdatedAtUtc)
+            .ToListAsync(cancellationToken);
+    }
 }

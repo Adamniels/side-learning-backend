@@ -23,7 +23,14 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception");
+            if (ex is AppValidationException || ex is ValidationException || ex is AppException)
+            {
+                // Optionally log at debug/info level if desired, but don't log as an Unhandled Error.
+            }
+            else
+            {
+                logger.LogError(ex, "Unhandled exception");
+            }
             await HandleAsync(context, ex);
         }
     }

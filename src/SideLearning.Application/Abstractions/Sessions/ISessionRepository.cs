@@ -8,5 +8,7 @@ public interface ISessionRepository
 
     Task<Session?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<IReadOnlyCollection<Session>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken);
+
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }
