@@ -1,6 +1,10 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using SideLearning.Application.Features.SessionDesign;
+using SideLearning.Application.Features.SessionDesign.Callback;
+using SideLearning.Application.Features.SessionDesign.Enqueue;
+using SideLearning.Application.Features.SessionDesign.Get;
 using SideLearning.Application.Features.Users.Interests.Add;
 using SideLearning.Application.Features.Users.Interests.List;
 using SideLearning.Application.Features.Users.Interests.Remove;
@@ -22,6 +26,10 @@ public static class DependencyInjection
         services.AddScoped<UpdateUserInterestCommandHandler>();
         services.AddScoped<RemoveUserInterestCommandHandler>();
         services.AddScoped<SideLearning.Application.Features.Sessions.List.ListSessionsQueryHandler>();
+        services.AddScoped<IUserLearningContextFactory, UserLearningContextFactory>();
+        services.AddScoped<EnqueueSessionDesignJobCommandHandler>();
+        services.AddScoped<GetSessionDesignJobQueryHandler>();
+        services.AddScoped<ProcessSessionDesignCallbackCommandHandler>();
         return services;
     }
 }

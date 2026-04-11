@@ -36,7 +36,11 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
                 ["Jwt:Audience"] = TestAudience,
                 ["Jwt:SigningKey"] = TestSigningKey,
                 ["Jwt:AccessTokenMinutes"] = "30",
-                ["Jwt:RefreshTokenDays"] = "7"
+                ["Jwt:RefreshTokenDays"] = "7",
+                ["SessionDesigner:EnableWorker"] = "false",
+                ["SessionDesigner:BaseUrl"] = "http://127.0.0.1:59999",
+                ["SessionDesigner:SharedSecret"] = "test_session_designer_secret",
+                ["PublicApi:BaseUrl"] = "http://localhost"
             };
 
             config.AddInMemoryCollection(inMemory);

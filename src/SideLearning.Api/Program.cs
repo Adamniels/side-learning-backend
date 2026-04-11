@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
 using SideLearning.Api.Features.Auth;
+using SideLearning.Api.Features.SessionDesign;
 using SideLearning.Api.Features.Sessions;
 using SideLearning.Api.Features.Users;
+using SideLearning.Api.SessionDesign;
 using SideLearning.Api.Middleware;
 using SideLearning.Application;
 using SideLearning.Infrastructure;
@@ -88,6 +90,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>();
 
+builder.Services.AddHostedService<SessionDesignJobWorker>();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -108,10 +112,13 @@ app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
+app.MapInternalSessionDesignCallbackEndpoints();
+
 var apiV1 = app.MapGroup("/api/v1");
 apiV1.MapAuthEndpoints();
 apiV1.MapUserInterestEndpoints();
 apiV1.MapSessionEndpoints();
+apiV1.MapSessionDesignEndpoints();
 
 app.MapHealthChecks("/health");
 

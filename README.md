@@ -81,8 +81,26 @@ Configuration merges **appsettings.json**, **appsettings.{Environment}.json**, a
 | `Jwt__AccessTokenMinutes` | Access token lifetime |
 | `Jwt__RefreshTokenDays` | Refresh token lifetime |
 | `Cors__AllowedOrigins__0`, `__1`, … | Allowed origins for browser clients (see CORS below) |
+| `SessionDesigner__BaseUrl` | Base URL of the Python session designer HTTP service (e.g. `http://localhost:8010`) |
+| `SessionDesigner__SharedSecret` | Shared secret; agent sends `X-Session-Designer-Secret` on callbacks — must match |
+| `SessionDesigner__EnableWorker` | When `true`, background worker claims jobs and POSTs to the designer (set `false` in tests) |
+| `PublicApi__BaseUrl` | Base URL the **agent** uses to call back (e.g. `http://localhost:5207` with the **http** launch profile) |
 
 In Development, if `Cors:AllowedOrigins` is empty, the API allows **any origin** for local experimentation. In other environments, set explicit origins.
+
+## Session design jobs (local dev, three terminals)
+
+Async flow: **`POST /api/v1/users/me/session-design/jobs`** returns **202** with a `jobId`; poll **`GET .../session-design/jobs/{jobId}`** for `queued` → `running` → `succeeded` or `failed`. The API worker POSTs to the designer; the designer runs LangGraph and calls **`POST /internal/session-design/jobs/{jobId}/callback`** with the same `SessionDesigner:SharedSecret` header.
+
+1. **PostgreSQL** — `docker compose up -d` from this repo (or your instance).
+2. **Session designer (FastAPI)** — from `create-session-agent` (venv):  
+   `SESSION_DESIGNER_SHARED_SECRET` = same value as .NET `SessionDesigner:SharedSecret`; optional `SESSION_DESIGNER_USE_MOCK=true` to skip Anthropic.  
+   `uvicorn session_designer.api.main:app --host 0.0.0.0 --port 8010`
+3. **SideLearning.Api** — use the **http** profile so callbacks stay on HTTP:  
+   `dotnet run --project src/SideLearning.Api/SideLearning.Api.csproj --launch-profile http`  
+   Ensure `PublicApi:BaseUrl` is `http://localhost:5207` (or the port you use).
+
+**Note:** `Running` jobs with no callback (e.g. designer down) can remain stuck until a future cleanup; see TODO in code.
 
 ## Database and migrations
 

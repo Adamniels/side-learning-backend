@@ -2,9 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SideLearning.Application.Abstractions.Authentication;
+using SideLearning.Application.Abstractions.SessionDesign;
 using SideLearning.Application.Abstractions.Sessions;
 using SideLearning.Application.Abstractions.Users;
+using SideLearning.Application.Configuration;
+using SideLearning.Infrastructure.SessionDesign;
 using SideLearning.Infrastructure.Authentication;
 using SideLearning.Infrastructure.Identity;
 using SideLearning.Infrastructure.Persistence;
@@ -37,9 +41,25 @@ public static class DependencyInjection
 
         services.AddScoped<ICredentialService, IdentityCredentialService>();
         services.AddScoped<ISessionRepository, SessionRepository>();
+        services.AddScoped<ISessionDesignJobRepository, SessionDesignJobRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthTokenService, AuthTokenService>();
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.Configure<SessionDesignerOptions>(configuration.GetSection(SessionDesignerOptions.SectionName));
+        services.Configure<PublicApiCallbacksOptions>(configuration.GetSection(PublicApiCallbacksOptions.SectionName));
+
+        services.AddHttpClient("SessionDesigner", (sp, http) =>
+        {
+            var o = sp.GetRequiredService<IOptions<SessionDesignerOptions>>().Value;
+            if (!string.IsNullOrWhiteSpace(o.BaseUrl))
+            {
+                http.BaseAddress = new Uri(o.BaseUrl.TrimEnd('/') + "/");
+            }
+
+            http.Timeout = TimeSpan.FromSeconds(Math.Max(1, o.HttpTimeoutSeconds));
+        });
+
+        services.AddScoped<ISessionDesignJobDispatchProcessor, SessionDesignJobDispatchProcessor>();
 
         return services;
     }
